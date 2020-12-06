@@ -32,7 +32,8 @@ namespace NetCoreHomework_20201206
             services.AddDbContext<ContosoUniversityContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-
+            services.AddScoped<ContosoUniversityContextProcedures>();
+            
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

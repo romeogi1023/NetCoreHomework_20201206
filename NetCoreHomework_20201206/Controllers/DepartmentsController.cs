@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreHomework_20201206.Models;
+using NetCoreHomework_20201206.ViewModel;
 
 namespace NetCoreHomework_20201206.Controllers
 {
@@ -14,10 +15,12 @@ namespace NetCoreHomework_20201206.Controllers
     public class DepartmentsController : ControllerBase
     {
         private readonly ContosoUniversityContext _context;
+        private readonly ContosoUniversityContextProcedures _spContext;
 
-        public DepartmentsController(ContosoUniversityContext context)
+        public DepartmentsController(ContosoUniversityContext context, ContosoUniversityContextProcedures spContext)
         {
             _context = context;
+            _spContext = spContext;
         }
 
         // GET: api/Departments
@@ -44,30 +47,16 @@ namespace NetCoreHomework_20201206.Controllers
         // PUT: api/Departments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutDepartment(int id, Department department)
+        public async Task<IActionResult> PutDepartment(int id, PutDepartmentVM input)
         {
-            if (id != department.DepartmentId)
+            var department = await _context.Department.FindAsync(id);
+            if (department == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(department).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DepartmentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            // TODO: 如何接sp回傳值
+            await _spContext.Department_Update(id, input.Name, input.Budget, input.StartDate, input.InstructorId, department.RowVersion);
 
             return NoContent();
         }
@@ -75,12 +64,12 @@ namespace NetCoreHomework_20201206.Controllers
         // POST: api/Departments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Department>> PostDepartment(Department department)
+        public async Task<IActionResult> PostDepartment(PostDepartmentVM input)
         {
-            _context.Department.Add(department);
-            await _context.SaveChangesAsync();
+            // TODO: 如何接sp回傳值
+            await _spContext.Department_Insert(input.Name, input.Budget, input.StartDate, input.InstructorId);
 
-            return CreatedAtAction("GetDepartment", new { id = department.DepartmentId }, department);
+            return NoContent();
         }
 
         // DELETE: api/Departments/5
@@ -93,8 +82,8 @@ namespace NetCoreHomework_20201206.Controllers
                 return NotFound();
             }
 
-            _context.Department.Remove(department);
-            await _context.SaveChangesAsync();
+            // TODO: 如何接sp回傳值
+            await _spContext.Department_Delete(id, department.RowVersion);
 
             return NoContent();
         }
