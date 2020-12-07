@@ -30,6 +30,13 @@ namespace NetCoreHomework_20201206.Controllers
             return await _context.Department.ToListAsync();
         }
 
+        // GET: api/Departments/DepartmentCourseCount
+        [HttpGet("DepartmentCourseCount")]
+        public async Task<ActionResult<IEnumerable<VwDepartmentCourseCount>>> GetDepartmentCourseCount()
+        {
+            return await _context.VwDepartmentCourseCount.FromSqlRaw("SELECT * FROM vwDepartmentCourseCount").ToListAsync();
+        }
+
         // GET: api/Departments/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Department>> GetDepartment(int id)
