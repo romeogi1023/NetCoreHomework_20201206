@@ -24,7 +24,7 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Course>>> GetCourse()
         {
-            return await _context.Course.ToListAsync();
+            return await _context.Course.Where(x => x.IsDeleted != true).ToListAsync();
         }
 
         // GET: api/Courses/CourseStudents
@@ -45,8 +45,7 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Course>> GetCourse(int id)
         {
-            var course = await _context.Course.FindAsync(id);
-
+            var course = await FindCourseAsync(id);
             if (course == null)
             {
                 return NotFound();
@@ -60,7 +59,7 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCourse(int id, PutCourseVM input)
         {
-            var course = await _context.Course.FindAsync(id);
+            var course = await FindCourseAsync(id);
             if (course == null)
             {
                 return NotFound();
@@ -88,21 +87,22 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
-            var course = await _context.Course.FindAsync(id);
+            var course = await FindCourseAsync(id);
             if (course == null)
             {
                 return NotFound();
             }
 
-            _context.Course.Remove(course);
+            course.IsDeleted = true;
+
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CourseExists(int id)
+        private async Task<Course> FindCourseAsync(int id)
         {
-            return _context.Course.Any(e => e.CourseId == id);
+            return await _context.Course.SingleOrDefaultAsync(x => x.CourseId == id && x.IsDeleted != true);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Department>>> GetDepartment()
         {
-            return await _context.Department.ToListAsync();
+            return await _context.Department.Where(x => x.IsDeleted != true).ToListAsync();
         }
 
         // GET: api/Departments/DepartmentCourseCount
@@ -42,8 +42,7 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Department>> GetDepartment(int id)
         {
-            var department = await _context.Department.FindAsync(id);
-
+            var department = await FindDepartmentAsync(id);
             if (department == null)
             {
                 return NotFound();
@@ -68,7 +67,7 @@ namespace NetCoreHomework_20201206.Controllers
 
             //return NoContent();
 
-            var department = await _context.Department.FindAsync(id);
+            var department = await FindDepartmentAsync(id);
             if (department == null)
             {
                 return NotFound();
@@ -96,21 +95,22 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
-            var department = await _context.Department.FindAsync(id);
+            var department = await FindDepartmentAsync(id);
             if (department == null)
             {
                 return NotFound();
             }
 
-            // TODO: 如何接sp回傳值
-            await _spContext.Department_Delete(id, department.RowVersion);
+            department.IsDeleted = true;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool DepartmentExists(int id)
+        private async Task<Department> FindDepartmentAsync(int id)
         {
-            return _context.Department.Any(e => e.DepartmentId == id);
+            return await _context.Department.SingleOrDefaultAsync(x => x.DepartmentId == id && x.IsDeleted != true);
         }
     }
 }
