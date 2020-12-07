@@ -27,6 +27,20 @@ namespace NetCoreHomework_20201206.Controllers
             return await _context.Course.ToListAsync();
         }
 
+        // GET: api/Courses/CourseStudents
+        [HttpGet("CourseStudents")]
+        public async Task<ActionResult<IEnumerable<VwCourseStudents>>> GetCourseStudents()
+        {
+            return await _context.VwCourseStudents.FromSqlInterpolated($@"SELECT * FROM vwCourseStudents").ToListAsync();
+        }
+
+        // GET: api/Courses/CourseStudentCount
+        [HttpGet("CourseStudentCount")]
+        public async Task<ActionResult<IEnumerable<VwCourseStudentCount>>> GetCourseStudentCount()
+        {
+            return await _context.VwCourseStudentCount.FromSqlInterpolated($@"SELECT * FROM vwCourseStudentCount").ToListAsync();
+        }
+
         // GET: api/Courses/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Course>> GetCourse(int id)
