@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreHomework_20201206.Models;
 using NetCoreHomework_20201206.ViewModel;
+using Omu.ValueInjecter;
 
 namespace NetCoreHomework_20201206.Controllers
 {
@@ -56,14 +57,26 @@ namespace NetCoreHomework_20201206.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDepartment(int id, PutDepartmentVM input)
         {
+            //var department = await _context.Department.FindAsync(id);
+            //if (department == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //// TODO: 如何接sp回傳值
+            //await _spContext.Department_Update(id, input.Name, input.Budget, input.StartDate, input.InstructorId, department.RowVersion);
+
+            //return NoContent();
+
             var department = await _context.Department.FindAsync(id);
             if (department == null)
             {
                 return NotFound();
             }
 
-            // TODO: 如何接sp回傳值
-            await _spContext.Department_Update(id, input.Name, input.Budget, input.StartDate, input.InstructorId, department.RowVersion);
+            department.InjectFrom(input);
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

@@ -21,6 +21,7 @@ namespace NetCoreHomework_20201206.Models
         public DateTime? HireDate { get; set; }
         public DateTime? EnrollmentDate { get; set; }
         public string Discriminator { get; set; }
+        public DateTime? DateModified { get; set; }
 
         public virtual OfficeAssignment OfficeAssignment { get; set; }
         public virtual ICollection<CourseInstructor> CourseInstructor { get; set; }

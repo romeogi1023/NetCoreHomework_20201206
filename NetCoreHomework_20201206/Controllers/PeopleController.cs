@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreHomework_20201206.Models;
+using NetCoreHomework_20201206.ViewModel;
+using Omu.ValueInjecter;
 
 namespace NetCoreHomework_20201206.Controllers
 {
@@ -44,30 +44,17 @@ namespace NetCoreHomework_20201206.Controllers
         // PUT: api/People/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPerson(int id, Person person)
+        public async Task<IActionResult> PutPerson(int id, PutPersonVM input)
         {
-            if (id != person.Id)
+            var person = await _context.Person.FindAsync(id);
+            if (person == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(person).State = EntityState.Modified;
+            person.InjectFrom(input);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PersonExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
